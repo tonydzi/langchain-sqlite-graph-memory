@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langchain-sqlite-graph-memory"
+version = "0.1.0"
+description = "LangChain retriever for sqlite-graph-memory: vector search + [[wikilink]] graph hop + cross-encoder rerank over your markdown notes. No server."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Anton Dziatkovskii" }]
+keywords = ["langchain", "retriever", "graph-rag", "obsidian", "wikilinks", "agent-memory", "rag"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "langchain-core>=1.0,<2",
+  "sqlite-graph-memory>=0.3.6",
+]
+
+[project.optional-dependencies]
+# The two local models. `lite` = ONNX, starts in seconds; `embeddings` = torch.
+lite = ["sqlite-graph-memory[lite]>=0.3.6"]
+embeddings = ["sqlite-graph-memory[embeddings]>=0.3.6"]
+test = ["pytest>=8", "langchain-tests>=1.0,<2"]
+
+[project.urls]
+Homepage = "https://github.com/tonydzi/langchain-sqlite-graph-memory"
+Repository = "https://github.com/tonydzi/langchain-sqlite-graph-memory"
+Issues = "https://github.com/tonydzi/langchain-sqlite-graph-memory/issues"
+"Core library" = "https://github.com/tonydzi/sqlite-graph-memory"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/langchain_sqlite_graph_memory"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
