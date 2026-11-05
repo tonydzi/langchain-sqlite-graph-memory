@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use tonydzi/langchain-sqlite-graph-memory in research or software, please cite it as below."
+title: "langchain-sqlite-graph-memory"
+type: software
+authors:
+  - family-names: Dziatkovskii
+    given-names: Anton
+    orcid: "https://orcid.org/0000-0001-7408-3054"
+    affiliation: "Palo Alto AI Research Lab"
+repository-code: "https://github.com/tonydzi/langchain-sqlite-graph-memory"
+url: "https://github.com/tonydzi/langchain-sqlite-graph-memory"
+abstract: >-
+  LangChain retriever for sqlite-graph-memory: vector search, 1-hop wikilink graph expansion and cross-encoder rerank over a folder of markdown notes, with no server.
