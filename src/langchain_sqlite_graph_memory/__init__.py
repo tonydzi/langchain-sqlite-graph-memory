@@ -2,4 +2,4 @@
 from langchain_sqlite_graph_memory.retrievers import SQLiteGraphMemoryRetriever
 
 __all__ = ["SQLiteGraphMemoryRetriever"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"

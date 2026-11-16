@@ -78,6 +78,51 @@ def test_same_order_as_the_sgm_pipeline(index_dir):
     assert got == want
 
 
+def _dense(index_dir, **kw):
+    """Retriever with the core default: no reranker object, rerank=None."""
+    return SQLiteGraphMemoryRetriever(index_dir=index_dir, encoder=FakeEncoder(), **kw)
+
+
+def test_default_follows_core_dense_order_and_never_loads_reranker(index_dir, monkeypatch):
+    """Core >=0.3.7 keeps the dense e5 order unless SGM_RERANK=1. The adapter must match
+    sgm-ask's default, and must not pull the cross-encoder in at all."""
+    from sqlite_graph_memory import brain_ask as sgm
+    from pathlib import Path
+
+    monkeypatch.delenv("SGM_RERANK", raising=False)
+    monkeypatch.setattr(sgm, "load_reranker", lambda *a, **k: (_ for _ in ()).throw(AssertionError("reranker loaded")))
+    q = "release deploy version"
+    emb, meta = sgm.load_index(Path(index_dir) / "_brain_e5.npy", Path(index_dir) / "_brain_e5_meta.pkl")
+    sims = sgm.query_sims(FakeEncoder(), emb, q)
+    base = sgm.retrieve_candidates(sims, meta)
+    added = sgm.expand_1hop(sims, meta, base)
+    want = [meta[i]["title"] for i, _ in sgm.rerank_candidates(None, q, base + added, meta, topn=3, sims=sims)]
+    docs = _dense(index_dir, k=3, graph=True).invoke(q)
+    assert [d.metadata["title"] for d in docs] == want
+    assert docs[0].metadata["score"] == pytest.approx(float(max(sims)), rel=1e-5)
+
+
+def test_sgm_rerank_env_turns_rerank_on(index_dir, monkeypatch):
+    from sqlite_graph_memory import brain_ask as sgm
+
+    calls = []
+    monkeypatch.setenv("SGM_RERANK", "1")
+    monkeypatch.setattr(sgm, "load_reranker", lambda *a, **k: calls.append(1) or FakeReranker())
+    _dense(index_dir, k=2).invoke("deploy release")
+    assert calls == [1]
+
+
+def test_rerank_false_ignores_a_passed_reranker(index_dir):
+    class Boom:
+        def predict(self, pairs):
+            raise AssertionError("reranker used despite rerank=False")
+
+    docs = SQLiteGraphMemoryRetriever(
+        index_dir=index_dir, encoder=FakeEncoder(), reranker=Boom(), rerank=False, k=2
+    ).invoke("deploy release")
+    assert len(docs) == 2
+
+
 async def _ainvoke(r, q):
     return await r.ainvoke(q)
 

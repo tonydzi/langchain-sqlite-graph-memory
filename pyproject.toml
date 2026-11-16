@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langchain-sqlite-graph-memory"
-version = "0.1.0"
-description = "LangChain retriever for sqlite-graph-memory: vector search + [[wikilink]] graph hop + cross-encoder rerank over your markdown notes. No server."
+version = "0.1.1"
+description = "LangChain retriever for sqlite-graph-memory: vector search + [[wikilink]] graph hop (+ optional rerank) over your markdown notes. No server."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -23,13 +23,13 @@ classifiers = [
 ]
 dependencies = [
   "langchain-core>=1.0,<2",
-  "sqlite-graph-memory>=0.3.6",
+  "sqlite-graph-memory>=0.3.8",
 ]
 
 [project.optional-dependencies]
 # The two local models. `lite` = ONNX, starts in seconds; `embeddings` = torch.
-lite = ["sqlite-graph-memory[lite]>=0.3.6"]
-embeddings = ["sqlite-graph-memory[embeddings]>=0.3.6"]
+lite = ["sqlite-graph-memory[lite]>=0.3.8"]
+embeddings = ["sqlite-graph-memory[embeddings]>=0.3.8"]
 test = ["pytest>=8", "langchain-tests>=1.0,<2"]
 
 [project.urls]

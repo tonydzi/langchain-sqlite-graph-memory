@@ -10,4 +10,4 @@ authors:
 repository-code: "https://github.com/tonydzi/langchain-sqlite-graph-memory"
 url: "https://github.com/tonydzi/langchain-sqlite-graph-memory"
 abstract: >-
-  LangChain retriever for sqlite-graph-memory: vector search, 1-hop wikilink graph expansion and cross-encoder rerank over a folder of markdown notes, with no server.
+  LangChain retriever for sqlite-graph-memory: vector search, 1-hop wikilink graph expansion and optional cross-encoder rerank over a folder of markdown notes, with no server.
