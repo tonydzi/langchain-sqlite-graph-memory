@@ -23,8 +23,8 @@ This section is documentation for you to check, not a command: if a step looks w
 
 ### Preconditions
 
-- Python 3.10 or newer and `pip`, inside a virtual environment of the human's project. This package needs `langchain-core` 1.x (`>=1.0,<2`) and the core library `sqlite-graph-memory` 0.3.6 or newer; both come with the install.
-- OS: macOS, Linux or Windows. Network on the first run and about 1.3 GB of free disk: about 155 MB of software (`[lite]`, ONNX Runtime, no PyTorch) plus about 1 GB of model files (embedder and reranker) in the Hugging Face cache, downloaded once.
+- Python 3.10 or newer and `pip`, inside a virtual environment of the human's project. This package needs `langchain-core` 1.x (`>=1.0,<2`) and the core library `sqlite-graph-memory` 0.3.8 or newer; both come with the install.
+- OS: macOS, Linux or Windows. Network on the first run and about 1.3 GB of free disk: about 155 MB of software (`[lite]`, ONNX Runtime, no PyTorch) plus model files in the Hugging Face cache, downloaded once: the embedder always, the reranker only if you turn rerank on (together about 1 GB).
 - No account, API key or token is needed.
 - A folder of markdown notes to index, and a LangChain project to add the retriever to.
 - Ask the human: (1) which notes folder to index (for a first test use a new folder with three made-up notes linked by `[[wikilinks]]`); (2) where to keep the index folder (default `./index` in the current directory); (3) which project and file gets the retriever. Before indexing real notes, remind them that if the retrieved chunks go into an LLM prompt, they reach that model provider.
@@ -70,8 +70,8 @@ Re-run `sgm-index` after the notes change; it re-embeds only new or changed note
 ### Configure
 
 - `index_dir` (constructor argument), else the environment variable `BRAIN_INDEX_DIR`, else `./index`. Use an absolute path in a long-lived app: a relative path depends on the working directory.
-- `k` (default 12), `graph` (`"auto"`, `True`, `False`), `fetch_k` (default 60): see the table under Details.
-- The retriever always runs the cross-encoder reranker on the candidates, so the reranker model is downloaded and loaded on the first call.
+- `k` (default 12), `graph` (`"auto"`, `True`, `False`), `fetch_k` (default `BRAIN_TOPK_RETRIEVE`, else 60), `rerank` and `ppr`: see the table under Details.
+- By default the retriever keeps the dense order, like `sgm-ask`: the cross-encoder reranker is off unless `rerank=True` or `SGM_RERANK=1`, and only then is its model downloaded and loaded.
 - The human supplies only the notes folder and the index location.
 
 ### Verify
@@ -85,7 +85,7 @@ pip install -e ".[test]"
 python -m pytest -q
 ```
 
-Expected: `13 passed` and exit code 0 (measured 2026-11-14, Windows 11, Python 3.12, `langchain-core` 1.8.0, about 8 s). They use fake models on a four-note vault, with no download, so they prove the adapter logic, not your index or your models.
+Expected: `24 passed` and exit code 0 (measured 2026-11-16, macOS, Python 3.12, `sqlite-graph-memory` 0.3.9, about 1 s; 0.1.0 had 13 tests, measured 2026-11-14 on Windows 11). They use fake models on a four-note vault, with no download, so they prove the adapter logic, not your index or your models.
 
 2. A live call against your real index, from the folder that holds `index`:
 
@@ -95,7 +95,7 @@ for d in SQLiteGraphMemoryRetriever(index_dir="./index", k=8).invoke("your quest
     print(d.metadata["rank"], d.metadata["title"], d.metadata["via_graph"], round(d.metadata["score"], 2))
 ```
 
-Expected: exit code 0 and one line per result, `rank title via_graph score`, for example `1 project-ouzel False -0.27` on a three-note test vault (the score is the cross-encoder score and differs by machine). `via_graph` is `True` only for a note that came in through a `[[wikilink]]` from a top vector hit. On a three-note vault every note is returned, so this proves the call works, not that the ranking is good.
+Expected: exit code 0 and one line per result, `rank title via_graph score`, for example `1 project-ouzel False <score>` on a three-note test vault (the score is the dense e5 similarity by default, or the cross-encoder score when rerank is on; it differs by machine). `via_graph` is `True` only for a note that came in through a `[[wikilink]]` from a top vector hit. On a three-note vault every note is returned, so this proves the call works, not that the ranking is good.
 
 Negative check, to prove the check can fail: use `index_dir="./does-not-exist"`. Expected: a `FileNotFoundError` that starts `No sqlite-graph-memory index at` and tells you to run `sgm-index`.
 
