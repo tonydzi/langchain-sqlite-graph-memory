@@ -37,7 +37,7 @@ In the human's virtual environment:
 pip install "langchain-sqlite-graph-memory[lite]"
 ```
 
-The same line works in PowerShell. `[lite]` is ONNX Runtime without PyTorch; use `[embeddings]` instead only for a GPU (PyTorch, about 0.9 to 2 GB). Check the result with `pip show langchain-sqlite-graph-memory` (version 0.1.0 on PyPI on 2026-11-14).
+The same line works in PowerShell. `[lite]` is ONNX Runtime without PyTorch; use `[embeddings]` instead only for a GPU (PyTorch, about 0.9 to 2 GB). Check the result with `pip show langchain-sqlite-graph-memory` (version 0.1.1 on PyPI, checked 2026-11-16).
 
 Build the index once. `sgm-index` comes from the core library installed above; it writes into `BRAIN_INDEX_DIR`, which defaults to `./index` in the current directory.
 
