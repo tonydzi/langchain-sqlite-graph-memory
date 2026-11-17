@@ -198,3 +198,7 @@ fake models on a four-note vault: no download, no GPU, a few seconds.
 ## License
 
 MIT
+
+## AI contributors
+
+This project is built by a human + AI team. Credit for AI tools on commits follows one policy, one source for every repo: [AI-CONTRIBUTORS.md](https://github.com/tonydzi/.github/blob/main/AI-CONTRIBUTORS.md).
